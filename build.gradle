@@ -28,3 +28,19 @@ p2deps {
 dependencies {
     implementation group: 'com.android.tools.ddms', name: 'ddmlib', version: '31.4.0'
 }
+
+tasks.named('startScripts') {
+    defaultJvmOpts = providers.systemProperty('os.name')
+            .map {
+                def fixed = it.toLowerCase(Locale.ENGLISH)
+                'darwin' in fixed || 'mac' in fixed
+            }
+            .map {
+                if (it) {
+                    ['-XstartOnFirstThread']
+                } else {
+                    []
+                }
+            }
+            .get()
+}
