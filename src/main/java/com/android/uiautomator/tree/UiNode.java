@@ -84,6 +84,26 @@ public class UiNode extends BasicTreeNode {
         mDisplayName = builder.toString();
     }
 
+    // add xpath by sanbo begin
+    private String getNodeClassAttribute() {
+        return this.mAttributes.get("class");
+    }
+
+    // 我的新增
+    public String getXpath() {
+        String className = getNodeClassAttribute();
+        String xpath = "//" + className;
+        String text = getAttribute("text");
+        if (text != null && !text.equals("")) {
+            xpath += "[@text='" + text + "']";
+            return xpath;
+        } else {
+            return getAttribute("content-desc") != "" ? xpath + "[@content-desc='" + getAttribute("content-desc") + "']"
+                    : xpath + "[@index='" + getAttribute("index") + "']";
+        }
+    }
+    // add xpath by sanbo end
+
     private void updateBounds(String bounds) {
         Matcher m = BOUNDS_PATTERN.matcher(bounds);
         if (m.matches()) {
@@ -108,8 +128,10 @@ public class UiNode extends BasicTreeNode {
 
     @Override
     public Object[] getAttributesArray() {
-        // this approach means we do not handle the situation where an attribute is added
-        // after this function is first called. This is currently not a concern because the
+        // this approach means we do not handle the situation where an attribute is
+        // added
+        // after this function is first called. This is currently not a concern because
+        // the
         // tree is supposed to be readonly
         if (mCachedAttributesArray == null) {
             mCachedAttributesArray = new Object[mAttributes.size()];

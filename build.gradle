@@ -21,3 +21,37 @@ p2deps {
 dependencies {
     implementation group: 'com.android.tools.ddms', name: 'ddmlib', version: '31.0.2'
 }
+
+// 修改目标文件以添加 JAVA_OPTS
+tasks.named('installDist') {
+    doLast {
+        def filePath = file("./build/install/uiautomatorviewer-gradle/bin/uiautomatorviewer-gradle")
+        if (filePath.exists()) {
+            def content = filePath.text
+            def javaOptsCheck = 'export JAVA_OPTS="-XstartOnFirstThread"'
+            if (!content.contains(javaOptsCheck)) {
+                // 定义新的 shell 内容
+                def newShellContent = '''#!/bin/sh
+
+# 检测平台并设置 JAVA_OPTS
+case "$(uname)" in
+    Darwin*)
+        export JAVA_OPTS="-XstartOnFirstThread"
+        ;;
+    *)
+        export JAVA_OPTS=""
+        ;;
+esac
+'''
+                // 将新的 shell 内容与原内容拼接
+                def newContent = content.replace("#!/bin/sh", newShellContent)
+                filePath.text = newContent
+                println "Added JAVA_OPTS to uiautomatorviewer-gradle for macOS"
+            } else {
+                println "JAVA_OPTS already present in uiautomatorviewer-gradle"
+            }
+        } else {
+            println "File uiautomatorviewer-gradle not found!"
+        }
+    }
+}

@@ -109,6 +109,13 @@ public class UiHierarchyXmlLoader {
                     }
                     if (mParentNode != null) {
                         mParentNode.addChild(mWorkingNode);
+
+                        // add xpath by sanbo begin
+                        if(mWorkingNode.getParent()!=null){
+                            String xpath = ((UiNode)mWorkingNode).getXpath();
+                            ((UiNode)mWorkingNode).addAtrribute("xpath",xpath);
+                        }
+                        //  add xpath by sanbo end
                         mNodeList.add(mWorkingNode);
                     }
                 }
@@ -126,6 +133,8 @@ public class UiHierarchyXmlLoader {
                 }
             }
         };
+
+
         try {
             parser.parse(new File(xmlPath), handler);
         } catch (SAXException e) {
